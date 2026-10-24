@@ -36,3 +36,17 @@ Exit codes: `0` VALID · `2` INVALID · `3` other state · `4` transport/usage e
 - Verification is not certification. A `VALID` result means the signed bytes verify against the pinned key; it
   says nothing about the truth, quality or compliance of the underlying claim.
 - One page/one card is a sample; absence is not evidence of absence.
+
+## Evidence events (CC0)
+
+Every run can emit one `csoai.evidence-event/0.1` record — the schema already published in
+`packages/evidence-fabric/schema/evidence-event-0.1.schema.json` (CC0-1.0). No new schema, no new fields.
+
+```bash
+python3 scripts/verify.py <card> --event=event.json --control=fixtures/card-tampered.json
+```
+
+State mapping: `VALID → CONSISTENT`, `INVALID → DIVERGENT`, `UNCHECKABLE → UNCHECKABLE`, `WITHDRAWN → PARTIAL`.
+`event_id = "sha256:" + sha256(RFC 8785 JCS(event − event_id, signature, anchors))`, computed exactly as
+`event.py::compute_event_id`. The optional `--control` runs a negative control and records its result, so an event
+never claims a control that was not run.
